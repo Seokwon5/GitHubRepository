@@ -32,7 +32,10 @@ class RepositoryListViewController: UITableViewController {
     }
     
     @objc func refresh() {
-        
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            self.fetchRepositories(of: self.organization)
+        }
     }
     
     func fetchRepositories(of organization: String) {
@@ -88,11 +91,24 @@ class RepositoryListViewController: UITableViewController {
 //UItableView DataSorce, Delegate
 extension RepositoryListViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        do {
+           return try repositories.value().count
+        } catch {
+            return 0
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "RepositoryListCell", for: indexPath) as? RepositoryListCell else { return UITableViewCell() }
+        
+        var currentRepo : Repository? {
+            do {
+                return try repositories.value()[indexPath.row]
+            }catch {
+                return nil
+            }
+        }
+        cell.repository = currentRepo
         
         return cell
                  
