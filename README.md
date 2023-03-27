@@ -5,3 +5,4 @@
 'Swift'
 'RxSwift'
 'Rest API'
+'비동기 처리'
